@@ -17,8 +17,8 @@ CORS(app) # Enable CORS for all routes. This is crucial for local development
 # Make sure your MySQL server is running.
 DB_CONFIG = {
     'host': 'localhost',
-    'user': 'root',    
-    'password': 'i5z5btipnbg', 
+    'user': 'user_name',    
+    'password': 'your_passwd', 
     'database': 'recipe_portal'
 }
 
