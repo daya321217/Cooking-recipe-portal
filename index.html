@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cooking Recipe Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e0e0e0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-7xl mx-auto bg-white shadow-lg rounded-xl p-6 md:p-10">
+        <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">
+            <span class="text-orange-500">Cooking</span> Recipe Portal
+        </h1>
+
+        <div class="flex flex-wrap justify-center gap-4 mb-8">
+            <button id="show-recipes-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+                View All Recipes
+            </button>
+            <button id="add-recipe-btn" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+                Add New Recipe
+            </button>
+        </div>
+
+        <div id="filter-section" class="bg-gray-100 p-6 rounded-lg shadow-inner mb-8">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Filter Recipes</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                <div>
+                    <label for="country-filter" class="block text-gray-700 text-sm font-bold mb-2">Country:</label>
+                    <select id="country-filter" class="shadow border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <option value="All">All Countries</option>
+                        </select>
+                </div>
+                <div>
+                    <label for="dietary-filter" class="block text-gray-700 text-sm font-bold mb-2">Dietary Preference:</label>
+                    <select id="dietary-filter" class="shadow border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <option value="All">All Preferences</option>
+                        <option value="Vegetarian">Vegetarian</option>
+                        <option value="Non-Vegetarian">Non-Vegetarian</option>
+                        <option value="Vegan">Vegan</option>
+                    </select>
+                </div>
+                <div class="md:col-span-1">
+                    <button id="apply-filters-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md w-full transition duration-300 ease-in-out transform hover:scale-105">
+                        Apply Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="recipe-list-section" class="hidden">
+            <h2 class="text-3xl font-semibold text-gray-700 mb-6 border-b-2 border-gray-200 pb-2">All Recipes</h2>
+            <div id="recipes-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <p class="text-gray-500 text-center col-span-full">Loading recipes...</p>
+            </div>
+        </div>
+
+        <div id="recipe-detail-section" class="hidden">
+            <button id="back-to-list-btn" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md mb-6 transition duration-300 ease-in-out transform hover:scale-105">
+                &larr; Back to Recipes
+            </button>
+            <div id="recipe-detail-content" class="bg-white p-6 rounded-lg shadow-md">
+                </div>
+        </div>
+
+        <div id="add-recipe-section" class="hidden">
+            <h2 class="text-3xl font-semibold text-gray-700 mb-6 border-b-2 border-gray-200 pb-2">Add New Recipe</h2>
+            <form id="add-recipe-form" class="space-y-4">
+                <div>
+                    <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Recipe Name:</label>
+                    <input type="text" id="name" name="name" required class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
+                <div>
+                    <label for="description" class="block text-gray-700 text-sm font-bold mb-2">Description:</label>
+                    <textarea id="description" name="description" rows="3" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+                </div>
+                <div>
+                    <label for="instructions" class="block text-gray-700 text-sm font-bold mb-2">Instructions (one instruction per line):</label>
+                    <textarea id="instructions" name="instructions" rows="6" required class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label for="preparation_time" class="block text-gray-700 text-sm font-bold mb-2">Preparation Time:</label>
+                        <input type="text" id="preparation_time" name="preparation_time" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+                    <div>
+                        <label for="cooking_time" class="block text-gray-700 text-sm font-bold mb-2">Cooking Time:</label>
+                        <input type="text" id="cooking_time" name="cooking_time" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+                    <div>
+                        <label for="servings" class="block text-gray-700 text-sm font-bold mb-2">Servings:</label>
+                        <input type="text" id="servings" name="servings" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+                </div>
+                <div>
+                    <label for="image_url" class="block text-gray-700 text-sm font-bold mb-2">Image URL:</label>
+                    <input type="text" id="image_url" name="image_url" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
+                <div>
+                    <label for="dietary_preference" class="block text-gray-700 text-sm font-bold mb-2">Dietary Preference:</label>
+                    <select id="dietary_preference" name="dietary_preference" required class="shadow border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <option value="">Select Preference</option>
+                        <option value="Vegetarian">Vegetarian</option>
+                        <option value="Non-Vegetarian">Non-Vegetarian</option>
+                        <option value="Vegan">Vegan</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="country_select" class="block text-gray-700 text-sm font-bold mb-2">Country (hold Ctrl/Cmd to select multiple):</label>
+                    <select id="country_select" name="country_select" multiple class="shadow border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 h-32">
+                        </select>
+                </div>
+
+                <h3 class="text-xl font-semibold text-gray-700 mt-6 mb-4">Ingredients:</h3>
+                <div id="ingredients-container" class="space-y-2">
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <input type="text" name="ingredient_name[]" placeholder="Ingredient Name" class="shadow appearance-none border rounded-lg py-2 px-3 text-gray-700 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <input type="text" name="ingredient_quantity[]" placeholder="Quantity (e.g., 200)" class="shadow appearance-none border rounded-lg py-2 px-3 text-gray-700 w-full sm:w-1/4 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <input type="text" name="ingredient_unit[]" placeholder="Unit (e.g., g)" class="shadow appearance-none border rounded-lg py-2 px-3 text-gray-700 w-full sm:w-1/5 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+                </div>
+                <button type="button" id="add-ingredient-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+                    Add Another Ingredient
+                </button>
+                
+                <div class="flex justify-end mt-6">
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+                        Add Recipe
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div id="message-box" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 hidden">
+            <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
+                <p id="message-text" class="text-lg font-medium text-gray-800 mb-4"></p>
+                <button id="message-ok-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-5 rounded-lg transition duration-300">OK</button>
+            </div>
+        </div>
+
+    </div> <script>
+        // IMPORTANT: Replace this with the actual URL where your Flask backend is running.
+        // During local development, it's usually http://127.0.0.1:5000
+        const API_BASE_URL = 'http://127.0.0.1:5000/api'; 
+
+        // Get references to HTML elements
+        const showRecipesBtn = document.getElementById('show-recipes-btn');
+        const addRecipeBtn = document.getElementById('add-recipe-btn');
+        const backToListBtn = document.getElementById('back-to-list-btn');
+        const applyFiltersBtn = document.getElementById('apply-filters-btn'); // New filter button
+
+        const recipeListSection = document.getElementById('recipe-list-section');
+        const recipeDetailSection = document.getElementById('recipe-detail-section');
+        const addRecipeSection = document.getElementById('add-recipe-section');
+        const filterSection = document.getElementById('filter-section'); // New filter section
+
+        const recipesContainer = document.getElementById('recipes-container');
+        const recipeDetailContent = document.getElementById('recipe-detail-content');
+        const addRecipeForm = document.getElementById('add-recipe-form');
+        const ingredientsContainer = document.getElementById('ingredients-container');
+        const addIngredientFieldBtn = document.getElementById('add-ingredient-btn');
+
+        const countryFilterSelect = document.getElementById('country-filter'); // New filter select
+        const dietaryFilterSelect = document.getElementById('dietary-filter'); // New filter select
+        const addRecipeCountrySelect = document.getElementById('country_select'); // For add recipe form
+
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+        const messageOkBtn = document.getElementById('message-ok-btn');
+
+        let allCountries = []; // To store countries fetched from API
+
+        // --- Utility Functions ---
+
+        /**
+         * Displays a custom message box instead of alert().
+         * @param {string} message The message to display.
+         */
+        function showMessageBox(message) {
+            messageText.textContent = message;
+            messageBox.classList.remove('hidden');
+        }
+
+        /**
+         * Hides all main sections.
+         */
+        function hideAllSections() {
+            recipeListSection.classList.add('hidden');
+            recipeDetailSection.classList.add('hidden');
+            addRecipeSection.classList.add('hidden');
+            filterSection.classList.add('hidden'); // Hide filter section initially
+        }
+
+        /**
+         * Renders a single recipe card for the list view.
+         * @param {object} recipe The recipe object.
+         * @returns {string} HTML string for the recipe card.
+         */
+        function renderRecipeCard(recipe) {
+            const imageUrl = recipe.image_url || 'https://placehold.co/300x200/cccccc/333333?text=No+Image';
+            const countriesDisplay = recipe.countries ? `<span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">${recipe.countries}</span>` : '';
+            const dietaryDisplay = `<span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">${recipe.dietary_preference}</span>`;
+
+            return `
+                <div class="bg-white rounded-lg shadow-md overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl cursor-pointer" 
+                     onclick="fetchRecipeDetail(${recipe.id})">
+                    <img src="${imageUrl}" alt="${recipe.name}" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">${recipe.name}</h3>
+                        <p class="text-gray-600 text-sm mb-2">${recipe.description ? recipe.description.substring(0, 100) + '...' : 'No description.'}</p>
+                        <div class="flex flex-wrap gap-2">
+                            ${countriesDisplay}
+                            ${dietaryDisplay}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Renders the detailed view of a single recipe.
+         * @param {object} recipe The recipe object with ingredients and countries.
+         */
+        function renderRecipeDetail(recipe) {
+            const imageUrl = recipe.image_url || 'https://placehold.co/800x400/cccccc/333333?text=No+Image';
+            const instructionsHtml = recipe.instructions ? 
+                recipe.instructions.split('\n').map(step => `<li class="mb-1">${step.trim()}</li>`).join('') : 
+                '<li>No instructions provided.</li>';
+            const ingredientsHtml = recipe.ingredients && recipe.ingredients.length > 0 ?
+                recipe.ingredients.map(ing => `<li>${ing.quantity} ${ing.unit} ${ing.name}</li>`).join('') :
+                '<li>No ingredients listed.</li>';
+            const countriesHtml = recipe.countries && recipe.countries.length > 0 ?
+                recipe.countries.map(country => `<span class="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded-full">${country}</span>`).join(' ') :
+                'N/A';
+
+            recipeDetailContent.innerHTML = `
+                <div class="text-center mb-6">
+                    <img src="${imageUrl}" alt="${recipe.name}" class="w-full max-h-96 object-cover rounded-lg mb-4 mx-auto shadow-md">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-2">${recipe.name}</h2>
+                    <p class="text-gray-600 text-lg">${recipe.description || ''}</p>
+                    <div class="flex justify-center gap-6 text-gray-700 mt-4">
+                        <span><strong>Prep:</strong> ${recipe.preparation_time || 'N/A'}</span>
+                        <span><strong>Cook:</strong> ${recipe.cooking_time || 'N/A'}</span>
+                        <span><strong>Servings:</strong> ${recipe.servings || 'N/A'}</span>
+                    </div>
+                    <div class="flex justify-center gap-4 mt-2">
+                        <span class="bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded-full">${recipe.dietary_preference || 'N/A'}</span>
+                        ${countriesHtml}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+                    <div>
+                        <h3 class="text-2xl font-semibold text-gray-700 mb-4 border-b pb-2">Ingredients</h3>
+                        <ul class="list-disc list-inside text-gray-700 space-y-1">
+                            ${ingredientsHtml}
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-semibold text-gray-700 mb-4 border-b pb-2">Instructions</h3>
+                        <ol class="list-decimal list-inside text-gray-700 space-y-1">
+                            ${instructionsHtml}
+                        </ol>
+                    </div>
+                </div>
+            `;
+            hideAllSections();
+            recipeDetailSection.classList.remove('hidden');
+        }
+
+        // --- Fetch Data Functions ---
+
+        /**
+         * Fetches all recipes from the backend API and displays them, applying filters.
+         */
+        async function fetchAllRecipes() {
+            hideAllSections();
+            filterSection.classList.remove('hidden'); // Show filter section when viewing recipes
+            recipeListSection.classList.remove('hidden');
+            recipesContainer.innerHTML = '<p class="text-gray-500 text-center col-span-full">Loading recipes...</p>'; // Show loading message
+
+            const selectedCountry = countryFilterSelect.value;
+            const selectedDietary = dietaryFilterSelect.value;
+
+            let queryParams = new URLSearchParams();
+            if (selectedCountry && selectedCountry !== 'All') {
+                queryParams.append('country', selectedCountry);
+            }
+            if (selectedDietary && selectedDietary !== 'All') {
+                queryParams.append('dietary_preference', selectedDietary);
+            }
+
+            const url = `${API_BASE_URL}/recipes?${queryParams.toString()}`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const recipes = await response.json();
+                
+                recipesContainer.innerHTML = ''; // Clear loading message
+
+                if (recipes.length === 0) {
+                    recipesContainer.innerHTML = '<p class="text-gray-500 text-center col-span-full">No recipes found matching your filters. Why not add one?</p>';
+                } else {
+                    recipes.forEach(recipe => {
+                        recipesContainer.innerHTML += renderRecipeCard(recipe);
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching recipes:', error);
+                recipesContainer.innerHTML = '<p class="text-red-500 text-center col-span-full">Failed to load recipes. Is the backend server running?</p>';
+                showMessageBox('Failed to load recipes. Please ensure the Flask backend is running and your database credentials are correct.');
+            }
+        }
+
+        /**
+         * Fetches details for a specific recipe from the backend API and displays it.
+         * @param {number} recipeId The ID of the recipe to fetch.
+         */
+        async function fetchRecipeDetail(recipeId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/recipes/${recipeId}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const recipe = await response.json();
+                renderRecipeDetail(recipe);
+            } catch (error) {
+                console.error('Error fetching recipe detail:', error);
+                showMessageBox('Failed to load recipe details. Please try again.');
+            }
+        }
+
+        /**
+         * Fetches all countries from the backend API and populates the dropdowns.
+         */
+        async function fetchCountriesAndPopulateDropdowns() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/countries`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                allCountries = await response.json(); // Store for later use in add form
+
+                // Populate filter dropdown
+                countryFilterSelect.innerHTML = '<option value="All">All Countries</option>';
+                allCountries.forEach(country => {
+                    const option = document.createElement('option');
+                    option.value = country.name;
+                    option.textContent = country.name;
+                    countryFilterSelect.appendChild(option);
+                });
+
+                // Populate add recipe form country select
+                addRecipeCountrySelect.innerHTML = ''; // Clear existing options
+                allCountries.forEach(country => {
+                    const option = document.createElement('option');
+                    option.value = country.id; // Use ID for submission
+                    option.textContent = country.name;
+                    addRecipeCountrySelect.appendChild(option);
+                });
+
+            } catch (error) {
+                console.error('Error fetching countries:', error);
+                showMessageBox('Failed to load country list. Please ensure the Flask backend is running.');
+            }
+        }
+
+
+        /**
+         * Handles the submission of the add recipe form.
+         * Sends the new recipe data to the backend API.
+         * @param {Event} event The form submission event.
+         */
+        async function handleAddRecipeSubmit(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const formData = new FormData(addRecipeForm);
+            const selectedCountryIds = Array.from(addRecipeCountrySelect.selectedOptions).map(option => parseInt(option.value));
+
+            const recipeData = {
+                name: formData.get('name'),
+                description: formData.get('description'),
+                instructions: formData.get('instructions'),
+                preparation_time: formData.get('preparation_time'),
+                cooking_time: formData.get('cooking_time'),
+                servings: formData.get('servings'),
+                image_url: formData.get('image_url'),
+                dietary_preference: formData.get('dietary_preference'),
+                ingredients: [],
+                country_ids: selectedCountryIds
+            };
+
+            // Collect ingredient data
+            const ingredientNames = formData.getAll('ingredient_name[]');
+            const ingredientQuantities = formData.getAll('ingredient_quantity[]');
+            const ingredientUnits = formData.getAll('ingredient_unit[]');
+
+            for (let i = 0; i < ingredientNames.length; i++) {
+                if (ingredientNames[i].trim()) { // Only add if ingredient name is not empty
+                    recipeData.ingredients.push({
+                        name: ingredientNames[i],
+                        quantity: ingredientQuantities[i],
+                        unit: ingredientUnits[i]
+                    });
+                }
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/recipes`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(recipeData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                showMessageBox(`Recipe "${recipeData.name}" added successfully!`);
+                addRecipeForm.reset(); // Clear the form
+                ingredientsContainer.innerHTML = `
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <input type="text" name="ingredient_name[]" placeholder="Ingredient Name" class="shadow appearance-none border rounded-lg py-2 px-3 text-gray-700 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <input type="text" name="ingredient_quantity[]" placeholder="Quantity (e.g., 200)" class="shadow appearance-none border rounded-lg py-2 px-3 text-gray-700 w-full sm:w-1/4 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <input type="text" name="ingredient_unit[]" placeholder="Unit (e.g., g)" class="shadow appearance-none border rounded-lg py-2 px-3 text-gray-700 w-full sm:w-1/5 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    </div>
+                `; // Reset ingredients
+                fetchAllRecipes(); // Refresh recipe list with potential new filters
+            } catch (error) {
+                console.error('Error adding recipe:', error);
+                showMessageBox(`Failed to add recipe: ${error.message}. Please check your input and ensure the backend is running.`);
+            }
+        }
+
+        /**
+         * Adds a new set of ingredient input fields to the form.
+         */
+        function addIngredientField() {
+            const newDiv = document.createElement('div');
+            newDiv.classList.add('flex', 'flex-col', 'sm:flex-row', 'gap-2');
+            newDiv.innerHTML = `
+                <input type="text" name="ingredient_name[]" placeholder="Ingredient Name" class="shadow appearance-none border rounded-lg py-2 px-3 text-gray-700 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <input type="text" name="ingredient_quantity[]" placeholder="Quantity (e.g., 200)" class="shadow appearance-none border rounded-lg py-2 px-3 text-gray-700 w-full sm:w-1/4 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <input type="text" name="ingredient_unit[]" placeholder="Unit (e.g., g)" class="shadow appearance-none border rounded-lg py-2 px-3 text-gray-700 w-full sm:w-1/5 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            `;
+            ingredientsContainer.appendChild(newDiv);
+        }
+
+        // --- Event Listeners ---
+        showRecipesBtn.addEventListener('click', fetchAllRecipes);
+        addRecipeBtn.addEventListener('click', () => {
+            hideAllSections();
+            addRecipeSection.classList.remove('hidden');
+            addRecipeForm.reset(); // Clear form when navigating to it
+            ingredientsContainer.innerHTML = `
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input type="text" name="ingredient_name[]" placeholder="Ingredient Name" class="shadow appearance-none border rounded-lg py-2 px-3 text-gray-700 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <input type="text" name="ingredient_quantity[]" placeholder="Quantity (e.g., 200)" class="shadow appearance-none border rounded-lg py-2 px-3 text-gray-700 w-full sm:w-1/4 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <input type="text" name="ingredient_unit[]" placeholder="Unit (e.g., g)" class="shadow appearance-none border rounded-lg py-2 px-3 text-gray-700 w-full sm:w-1/5 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
+            `; // Reset ingredients
+            fetchCountriesAndPopulateDropdowns(); // Ensure countries are loaded for the add form
+        });
+        backToListBtn.addEventListener('click', fetchAllRecipes);
+        applyFiltersBtn.addEventListener('click', fetchAllRecipes); // New event listener for filter button
+        addRecipeForm.addEventListener('submit', handleAddRecipeSubmit);
+        addIngredientFieldBtn.addEventListener('click', addIngredientField);
+        messageOkBtn.addEventListener('click', () => messageBox.classList.add('hidden'));
+
+        // Initial load: show recipes and populate country filters when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchCountriesAndPopulateDropdowns(); // Populate filter dropdowns first
+            fetchAllRecipes(); // Then fetch recipes
+        });
+    </script>
+</body>
+</html>
